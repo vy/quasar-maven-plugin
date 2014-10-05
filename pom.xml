@@ -28,10 +28,27 @@
         <dependency>
             <groupId>co.paralleluniverse</groupId>
             <artifactId>quasar-core</artifactId>
-            <version>0.6.0</version>
+            <version>0.6.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <name>Sonatype Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    
     <build>
         <plugins>
             <plugin>
@@ -45,11 +62,11 @@
                 </configuration>
             </plugin>
             <!--
-              With Java annotations support added in Maven Plugin Tools 3.0, descriptor
-              cannot be generated before compilation actually, to use annotations, users
-              need to add extra configuration to avoid failure and to bind the goal to
-              proper phase. [http://jira.codehaus.org/browse/MNG-5346]
-              -->
+            With Java annotations support added in Maven Plugin Tools 3.0, descriptor
+            cannot be generated before compilation actually, to use annotations, users
+            need to add extra configuration to avoid failure and to bind the goal to
+            proper phase. [http://jira.codehaus.org/browse/MNG-5346]
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
