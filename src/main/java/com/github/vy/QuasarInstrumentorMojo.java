@@ -14,7 +14,7 @@ import java.util.Queue;
 /**
  * Quasar Ahead-of-Time instrumentor Mojo.
  */
-@Mojo(name = "quasar", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
+@Mojo(name = "instrument", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class QuasarInstrumentorMojo extends AbstractMojo {
 
     /**

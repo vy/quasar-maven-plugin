@@ -1,13 +1,13 @@
 package com.github.vy;
 
-import co.paralleluniverse.common.util.Debug;
-import co.paralleluniverse.fibers.instrument.*;
+import co.paralleluniverse.fibers.instrument.Log;
+import co.paralleluniverse.fibers.instrument.LogLevel;
+import co.paralleluniverse.fibers.instrument.MethodDatabase;
+import co.paralleluniverse.fibers.instrument.QuasarInstrumentor;
+import co.paralleluniverse.fibers.instrument.SimpleSuspendableClassifier;
+import co.paralleluniverse.fibers.instrument.SuspendableClassifier;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.util.CheckClassAdapter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,23 +68,12 @@ public class QuasarWrapper {
         });
     }
 
-    protected void logDebug(String fmt, Object... args) {
-        mojo.getLog().debug(String.format(fmt, args));
-    }
-
-    protected void logInfo(String fmt, Object... args) {
+    private void logInfo(String fmt, Object... args) {
         mojo.getLog().info(String.format(fmt, args));
     }
 
-    protected void logWarn(String fmt, Object... args) {
-        mojo.getLog().warn(String.format(fmt, args));
-    }
-
-    protected void logError(String s, Exception e) {
-        mojo.getLog().error(s, e);
-    }
-
     public void checkClass(File file) {
+        logInfo("Checking class: %s", file.toPath());
         instrumentor.checkClass(file);
     }
 
@@ -96,11 +85,11 @@ public class QuasarWrapper {
 
     private void instrumentClass(MethodDatabase.WorkListEntry entry)
             throws MojoExecutionException {
-        if (!shouldInstrument(entry.name)) return;
+        if (!instrumentor.shouldInstrument(entry.name)) return;
         try {
             try (FileInputStream fis = new FileInputStream(entry.file)) {
                 String className = entry.name.replace('.', '/');
-                byte[] newClass = instrumentClass(className, new ClassReader(fis));
+                byte[] newClass = instrumentor.instrumentClass(className, fis);
                 try (FileOutputStream fos = new FileOutputStream(entry.file)) {
                     fos.write(newClass);
                 }
@@ -108,76 +97,6 @@ public class QuasarWrapper {
         } catch (IOException ex) {
             throw new MojoExecutionException("Instrumenting file " + entry.file, ex);
         }
-    }
-
-    /**
-     * Copied from Quasar sources for {@code shouldInstrument(String)}.
-     * @see <a href="https://github.com/puniverse/quasar/blob/master/quasar-core/src/main/java/co/paralleluniverse/fibers/instrument/Classes.java">co.paralleluniverse.fibers.instrument.Classes</a>
-     */
-    private static class Classes {
-        static final String FIBER_CLASS_NAME = "co/paralleluniverse/fibers/Fiber";
-        static final String STACK_NAME = "co/paralleluniverse/fibers/Stack";
-    }
-
-    /**
-     * Copied from Quasar sources.
-     * @see <a href="https://github.com/puniverse/quasar/blob/master/quasar-core/src/main/java/co/paralleluniverse/fibers/instrument/QuasarInstrumentor.java">co.paralleluniverse.fibers.instrument.QuasarInstrumentor</a>
-     */
-    private static boolean shouldInstrument(String className) {
-        className = className.replace('.', '/');
-        return (!(className.startsWith("co/paralleluniverse/fibers/instrument/") && !Debug.isUnitTest()) &&
-                !className.startsWith("org/objectweb/asm/") &&
-                !className.startsWith("org/netbeans/lib/") &&
-                !(className.equals(Classes.FIBER_CLASS_NAME) || className.startsWith(Classes.FIBER_CLASS_NAME + '$')) &&
-                !className.equals(Classes.STACK_NAME) &&
-                !MethodDatabase.isJavaCore(className));
-    }
-
-    /**
-     * Copied from Quasar sources.
-     * @see <a href="https://github.com/puniverse/quasar/blob/master/quasar-core/src/main/java/co/paralleluniverse/fibers/instrument/DBClassWriter.java">co.paralleluniverse.fibers.instrument.DBClassWriter</a>
-     */
-    private static class DBClassWriter extends ClassWriter {
-
-        private final MethodDatabase db;
-
-        public DBClassWriter(MethodDatabase db, ClassReader classReader) {
-            super(classReader, COMPUTE_FRAMES | COMPUTE_MAXS);
-            this.db = db;
-        }
-
-        @Override
-        protected String getCommonSuperClass(String type1, String type2) {
-            return db.getCommonSuperClass(type1, type2);
-        }
-
-    }
-
-    /**
-     * Copied from Quasar sources.
-     * @see <a href="https://github.com/puniverse/quasar/blob/master/quasar-core/src/main/java/co/paralleluniverse/fibers/instrument/QuasarInstrumentor.java">co.paralleluniverse.fibers.instrument.QuasarInstrumentor</a>
-     */
-    private byte[] instrumentClass(String className, ClassReader r) {
-        logInfo("TRANSFORM: %s %s", className,
-                (db.getClassEntry(className) != null && db.getClassEntry(className).requiresInstrumentation()) ? "request" : "");
-        ClassWriter cw = new DBClassWriter(db, r);
-        ClassVisitor cv = new CheckClassAdapter(cw);
-        InstrumentClass ic = new InstrumentClass(cv, db, false);
-        byte[] transformed;
-        try {
-            r.accept(ic, ClassReader.SKIP_FRAMES);
-            transformed = cw.toByteArray();
-        } catch (Exception e) {
-            if (ic.hasSuspendableMethods()) {
-                logError("Unable to instrument class " + className, e);
-                throw e;
-            } else {
-                if (!MethodDatabase.isProblematicClass(className))
-                    logDebug("Unable to instrument class " + className);
-                return null;
-            }
-        }
-        return transformed;
     }
 
 }
