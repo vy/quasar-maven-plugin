@@ -18,6 +18,14 @@
     </description>
     <url>https://github.com/vy/quasar-maven-plugin</url>
 
+    <licenses>
+        <license>
+            <name>The BSD 3-Clause License</name>
+            <url>http://opensource.org/licenses/BSD-3-Clause</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <scm>
         <url>http://github.com/vy/quasar-maven-plugin</url>
         <connection>scm:git:git://github.com/vy/quasar-maven-plugin.git</connection>
