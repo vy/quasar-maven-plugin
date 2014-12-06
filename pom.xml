@@ -18,6 +18,12 @@
     </description>
     <url>https://github.com/vy/quasar-maven-plugin</url>
 
+    <scm>
+        <url>http://github.com/vy/quasar-maven-plugin</url>
+        <connection>scm:git:git://github.com/vy/quasar-maven-plugin.git</connection>
+        <developerConnection>scm:git:git://github.com/vy/quasar-maven-plugin.git</developerConnection>
+    </scm>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
