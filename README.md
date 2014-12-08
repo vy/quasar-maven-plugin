@@ -21,7 +21,7 @@ Configure the plugin to instrument the code:
     <plugin>
         <groupId>com.github.vy</groupId>
         <artifactId>quasar-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>0.1-SNAPSHOT</version>
         <configuration>
             <check>true</check>
             <debug>true</debug>
