@@ -1,4 +1,4 @@
-package com.github.vy.maven.plugins.quasar;
+package com.vlkan.maven.plugins.quasar;
 
 import co.paralleluniverse.fibers.instrument.DefaultSuspendableClassifier;
 import co.paralleluniverse.fibers.instrument.Log;

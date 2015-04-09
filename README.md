@@ -11,7 +11,7 @@ Usage
 Add the following Maven dependency to your POM file:
 
     <dependency>
-        <groupId>com.github.vy</groupId>
+        <groupId>com.vlkan</groupId>
         <artifactId>quasar-maven-plugin</artifactId>
         <version>0.6.2</version>
     </dependency>
@@ -19,7 +19,7 @@ Add the following Maven dependency to your POM file:
 Configure the plugin to instrument the code:
 
     <plugin>
-        <groupId>com.github.vy</groupId>
+        <groupId>com.vlkan</groupId>
         <artifactId>quasar-maven-plugin</artifactId>
         <version>0.6.2</version>
         <configuration>
