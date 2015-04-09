@@ -13,7 +13,7 @@ Add the following Maven dependency to your POM file:
     <dependency>
         <groupId>com.github.vy</groupId>
         <artifactId>quasar-maven-plugin</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.6.2</version>
     </dependency>
 
 Configure the plugin to instrument the code:
@@ -21,7 +21,7 @@ Configure the plugin to instrument the code:
     <plugin>
         <groupId>com.github.vy</groupId>
         <artifactId>quasar-maven-plugin</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.6.2</version>
         <configuration>
             <check>true</check>
             <debug>true</debug>
