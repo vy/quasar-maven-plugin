@@ -106,7 +106,7 @@ public class QuasarInstrumentorMojo extends AbstractMojo {
             }
 
             @Override
-            public void error(String s, Exception e) {
+            public void error(String s, Throwable e) {
                 getLog().error(s, e);
             }
 
