@@ -62,7 +62,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <java.version>1.7</java.version>
         <quasar.version>0.7.3</quasar.version>
         <maven-api.version>3.3.3</maven-api.version>
         <maven-annotations.version>3.3</maven-annotations.version>
