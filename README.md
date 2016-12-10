@@ -8,20 +8,12 @@ instrumentation of the compiled class files.
 Usage
 =====
 
-Add the following Maven dependency to your POM file:
-
-    <dependency>
-        <groupId>com.vlkan</groupId>
-        <artifactId>quasar-maven-plugin</artifactId>
-        <version>0.7.3</version>
-    </dependency>
-
 Configure the plugin to instrument the code:
 
     <plugin>
         <groupId>com.vlkan</groupId>
         <artifactId>quasar-maven-plugin</artifactId>
-        <version>0.7.3</version>
+        <version>0.7.5</version>
         <configuration>
             <check>true</check>
             <debug>true</debug>
