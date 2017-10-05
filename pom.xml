@@ -1,12 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.vlkan</groupId>
     <artifactId>quasar-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>0.7.9-SNAPSHOT</version>
+    <version>0.7.9</version>
     <name>Quasar Maven Plugin</name>
     <description>
         Quasar is a Java library that provides high-performance lightweight
@@ -45,7 +43,8 @@
         <url>http://github.com/vy/quasar-maven-plugin</url>
         <connection>scm:git:git@github.com:vy/quasar-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:vy/quasar-maven-plugin.git</developerConnection>
-    </scm>
+      <tag>v0.7.9</tag>
+  </scm>
 
     <distributionManagement>
         <snapshotRepository>
