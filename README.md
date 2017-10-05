@@ -28,6 +28,11 @@ Configure the plugin to instrument the code:
         </executions>
     </plugin>
 
+Contributors
+============
+
+- [Stéphane Épardaud](https://github.com/FroMage)
+
 License
 =======
 
