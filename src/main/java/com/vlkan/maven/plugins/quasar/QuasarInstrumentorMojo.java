@@ -1,31 +1,40 @@
 package com.vlkan.maven.plugins.quasar;
 
-import co.paralleluniverse.fibers.instrument.DefaultSuspendableClassifier;
-import co.paralleluniverse.fibers.instrument.Log;
-import co.paralleluniverse.fibers.instrument.LogLevel;
-import co.paralleluniverse.fibers.instrument.MethodDatabase;
-import co.paralleluniverse.fibers.instrument.QuasarInstrumentor;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
+
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+
+import co.paralleluniverse.fibers.instrument.Log;
+import co.paralleluniverse.fibers.instrument.LogLevel;
+import co.paralleluniverse.fibers.instrument.QuasarInstrumentor;
 
 /**
  * Quasar Ahead-of-Time instrumentor Mojo.
  */
-@Mojo(name = "instrument", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
+@Mojo(name = "instrument", 
+    defaultPhase = LifecyclePhase.PROCESS_CLASSES, 
+    requiresDependencyResolution = ResolutionScope.COMPILE)
 public class QuasarInstrumentorMojo extends AbstractMojo {
     /**
      * Build directory path.
@@ -62,6 +71,9 @@ public class QuasarInstrumentorMojo extends AbstractMojo {
      */
     @Parameter
     protected boolean allowBlocking = false;
+    
+    @Parameter( defaultValue = "${project}", readonly = true, required = true )
+    protected MavenProject project;
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -72,10 +84,18 @@ public class QuasarInstrumentorMojo extends AbstractMojo {
 
         // Create a Quasar instrumentor.
         final QuasarInstrumentor instrumentor;
+        final ClassLoader cl;
         try {
-            final ClassLoader cl = new URLClassLoader(new URL[]{buildDirectory.toURI().toURL()}, getClass().getClassLoader());
-            instrumentor = new QuasarInstrumentor(true, cl, new DefaultSuspendableClassifier(cl));
+            List<String> elements = project.getTestClasspathElements();
+            URL[] urls = new URL[elements.size()];
+            for(int i=0;i<elements.size();i++){
+                urls[i] = new File(elements.get(i)).toURI().toURL();
+            }
+            cl = new URLClassLoader(urls, getClass().getClassLoader());
+            instrumentor = new QuasarInstrumentor(true);
         } catch (MalformedURLException e) {
+            throw new AssertionError(e);
+        } catch (DependencyResolutionRequiredException e) {
             throw new AssertionError(e);
         }
 
@@ -114,17 +134,21 @@ public class QuasarInstrumentorMojo extends AbstractMojo {
 
         // Traverse the build directory and feed the class files to the instrumentor.
         final Queue<File> files = new LinkedList<>(Collections.singleton(buildDirectory));
+        Map<String, File> classes = new HashMap<>();
         while (!files.isEmpty()) {
             File file = files.poll();
             if (file.isDirectory()) {
                 File[] dirFiles = file.listFiles();
                 if (dirFiles != null)
                     Collections.addAll(files, dirFiles);
-            } else if (file.getName().endsWith(".class"))
-                instrumentor.checkClass(file);
+            } else if (file.getName().endsWith(".class")){
+                String checkedClass = instrumentor.getMethodDatabase(cl).checkClass(file);
+                if(checkedClass != null)
+                    classes.put(checkedClass, file);
+            }
         }
 
-        instrumentClasses(instrumentor);
+        instrumentClasses(instrumentor, cl, classes);
     }
 
     protected void logDebug(String fmt, Object... args) {
@@ -143,25 +167,25 @@ public class QuasarInstrumentorMojo extends AbstractMojo {
         getLog().error(s, e);
     }
 
-    public void instrumentClasses(QuasarInstrumentor instrumentor) throws MojoExecutionException {
-        logInfo("Instrumenting %d classes...", instrumentor.getWorkList().size());
-        for (MethodDatabase.WorkListEntry wle : instrumentor.getWorkList())
-            instrumentClass(instrumentor, wle);
+    public void instrumentClasses(QuasarInstrumentor instrumentor, ClassLoader cl, Map<String, File> classes) throws MojoExecutionException {
+        logInfo("Instrumenting %d classes...", classes.size());
+        for (Entry<String, File> entry : classes.entrySet())
+            instrumentClass(instrumentor, cl, entry.getKey(), entry.getValue());
     }
 
-    private void instrumentClass(QuasarInstrumentor instrumentor, MethodDatabase.WorkListEntry entry) throws MojoExecutionException {
-        if (!instrumentor.shouldInstrument(entry.name))
+    private void instrumentClass(QuasarInstrumentor instrumentor, ClassLoader cl, String name, File file) throws MojoExecutionException {
+        if (!instrumentor.shouldInstrument(name))
             return;
         try {
-            try (FileInputStream fis = new FileInputStream(entry.file)) {
-                String className = entry.name.replace('.', '/');
-                byte[] newClass = instrumentor.instrumentClass(className, fis);
-                try (FileOutputStream fos = new FileOutputStream(entry.file)) {
+            try (FileInputStream fis = new FileInputStream(file)) {
+                String className = name.replace('.', '/');
+                byte[] newClass = instrumentor.instrumentClass(cl, className, fis);
+                try (FileOutputStream fos = new FileOutputStream(file)) {
                     fos.write(newClass);
                 }
             }
         } catch (IOException ex) {
-            throw new MojoExecutionException("Instrumenting file " + entry.file, ex);
+            throw new MojoExecutionException("Instrumenting file " + file, ex);
         }
     }
 }
