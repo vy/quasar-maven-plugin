@@ -43,8 +43,8 @@
 
     <scm>
         <url>http://github.com/vy/quasar-maven-plugin</url>
-        <connection>scm:git:git://github.com/vy/quasar-maven-plugin.git</connection>
-        <developerConnection>scm:git:git://github.com/vy/quasar-maven-plugin.git</developerConnection>
+        <connection>scm:git:git@github.com:vy/quasar-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:vy/quasar-maven-plugin.git</developerConnection>
     </scm>
 
     <distributionManagement>
