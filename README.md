@@ -13,23 +13,25 @@ Usage
 
 Configure the plugin to instrument the code:
 
-    <plugin>
-        <groupId>com.vlkan</groupId>
-        <artifactId>quasar-maven-plugin</artifactId>
-        <version>0.7.5</version>
-        <configuration>
-            <check>true</check>
-            <debug>true</debug>
-            <verbose>true</verbose>
-        </configuration>
-        <executions>
-            <execution>
-                <goals>
-                    <goal>instrument</goal>
-                </goals>
-            </execution>
-        </executions>
-    </plugin>
+```xml
+<plugin>
+    <groupId>com.vlkan</groupId>
+    <artifactId>quasar-maven-plugin</artifactId>
+    <version>0.7.9</version>
+    <configuration>
+        <check>true</check>
+        <debug>true</debug>
+        <verbose>true</verbose>
+    </configuration>
+    <executions>
+        <execution>
+            <goals>
+                <goal>instrument</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
 
 Contributors
 ============
