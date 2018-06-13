@@ -1,3 +1,9 @@
+**Warning!** Due to lack of time and [Quasar developers' unwillingness to
+distribute this plug-in in the official Quasar release](https://groups.google.com/d/msg/quasar-pulsar-user/GzvktONJkpY/t1_MmdcLAgAJ),
+**I AM NOT MAINTAINING THIS PLUG-IN ANYMORE.** (Further, I am not even sure if
+Quasar itself is maintained at all.) That being said, I would be more than happy
+to handover the project to someone else stepping up.
+
 [![Build Status](https://secure.travis-ci.org/vy/quasar-maven-plugin.svg)](http://travis-ci.org/vy/quasar-maven-plugin)
 [![Maven Central](https://img.shields.io/maven-central/v/com.vlkan/quasar-maven-plugin.svg)](https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22quasar-maven-plugin%22)
 
