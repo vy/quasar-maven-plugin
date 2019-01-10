@@ -1,17 +1,5 @@
 package com.vlkan.maven.plugins.quasar;
 
-import co.paralleluniverse.fibers.instrument.Log;
-import co.paralleluniverse.fibers.instrument.LogLevel;
-import co.paralleluniverse.fibers.instrument.QuasarInstrumentor;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,6 +14,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+import co.paralleluniverse.fibers.instrument.Log;
+import co.paralleluniverse.fibers.instrument.LogLevel;
+import co.paralleluniverse.fibers.instrument.QuasarInstrumentor;
 
 /**
  * Quasar Ahead-of-Time instrumentor Mojo.
@@ -64,6 +63,12 @@ public class QuasarInstrumentorMojo extends AbstractMojo {
      */
     @Parameter
     protected boolean allowMonitors = false;
+    
+    /**
+     * include base packages
+     */
+    @Parameter
+    protected String[] inclusions;
 
     /**
      * Enable to allow the use known blocking calls like Thread.sleep, Object.wait etc.
@@ -171,6 +176,19 @@ public class QuasarInstrumentorMojo extends AbstractMojo {
     }
 
     private void instrumentClass(QuasarInstrumentor instrumentor, ClassLoader cl, String name, File file) throws MojoExecutionException {
+        boolean matchInclude = false;
+        if (inclusions != null) {
+          for (String s : inclusions) {
+            if (name.startsWith(s.replace(".", "/"))) {
+              matchInclude = true;
+              break;
+            }
+          }
+        }
+        if (!matchInclude) {
+          logInfo("class %s was excluded. ", name);
+          return;
+        }
         if (!instrumentor.shouldInstrument(name))
             return;
         try {
