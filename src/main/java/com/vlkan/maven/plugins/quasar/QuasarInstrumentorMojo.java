@@ -83,9 +83,6 @@ public class QuasarInstrumentorMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         getLog().info("Instrumenting Quasar classes...");
 
-        if (buildDirectory == null || !buildDirectory.isDirectory())
-            throw new MojoExecutionException("Invalid build directory: " + buildDirectory);
-
         // Create a Quasar instrumentor.
         final QuasarInstrumentor instrumentor;
         final ClassLoader cl;
