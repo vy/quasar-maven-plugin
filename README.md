@@ -23,7 +23,7 @@ Configure the plugin to instrument the code:
 <plugin>
     <groupId>com.vlkan</groupId>
     <artifactId>quasar-maven-plugin</artifactId>
-    <version>0.7.9</version>
+    <version>0.8.0</version>
     <configuration>
         <check>true</check>
         <debug>true</debug>
@@ -47,7 +47,7 @@ Contributors
 License
 =======
 
-Copyright &copy; 2014-2017 [Volkan Yazıcı](http://vlkan.com/)
+Copyright &copy; 2014-2020 [Volkan Yazıcı](http://vlkan.com/)
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
